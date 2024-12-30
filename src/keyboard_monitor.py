@@ -1,6 +1,8 @@
 from pynput import keyboard
+from pynput.keyboard import Controller
 from save_handler import backup_saves, restore_save, get_sorted_saves
 from datetime import datetime
+import time
 
 
 def keyboard_monitor():
@@ -30,6 +32,11 @@ def keyboard_monitor():
                     print(f"Restoring save: {saves[current_index].name}")
                     restore_save(saves[current_index])
                     current_index = -1
+
+                    keyboard_control = Controller()
+                    keyboard_control.press('f')
+                    time.sleep(1)
+                    keyboard_control.release('f')
 
     def on_release(key):
         if key == keyboard.Key.esc:
