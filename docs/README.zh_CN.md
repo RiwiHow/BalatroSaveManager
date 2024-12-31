@@ -1,5 +1,5 @@
 # BalatroSaveManager
-[English](https://github.com/RiwiHow/BalatroSaveManager) | 简体中文
+[English](https://github.com/RiwiHow/BalatroSaveManager?tab=readme-ov-file#balatrosavemanager) | 简体中文
 
 一个简单的工具来管理 Balatro 的存档。
 
