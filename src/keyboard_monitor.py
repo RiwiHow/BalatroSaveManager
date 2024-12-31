@@ -33,7 +33,7 @@ def keyboard_monitor():
 
                     keyboard_control = Controller()
                     keyboard_control.press('f')
-                    time.sleep(1)
+                    time.sleep(0.8)
                     keyboard_control.release('f')
 
     def on_release(key):
