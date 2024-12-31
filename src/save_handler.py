@@ -39,6 +39,19 @@ def restore_save(save_path: Path) -> bool:
         return False
 
 
+def delete_saves() -> bool:
+    try:
+        for item in DESTINATION_PATH_ROOT.iterdir():
+            if item.is_dir():
+                shutil.rmtree(item)
+            else:
+                item.unlink()
+        return True
+    except Exception as e:
+        print(f"Error deleting saves: {str(e)}")
+        return False
+
+
 def get_sorted_saves():
     dst = DESTINATION_PATH_ROOT
     if not dst.exists():

@@ -1,7 +1,7 @@
 import time
 from pynput import keyboard
 from pynput.keyboard import Controller
-from save_handler import backup_saves, restore_save, get_sorted_saves
+from save_handler import backup_saves, restore_save, get_sorted_saves, delete_saves
 
 
 def keyboard_monitor():
@@ -16,8 +16,12 @@ def keyboard_monitor():
     def on_press(key):
         nonlocal current_index
         try:
-            if key.char == '[':
+            if key.char == "[":
                 backup_saves()
+                refresh_saves()
+                current_index = -1
+            elif key.char == "e":
+                delete_saves()
                 refresh_saves()
                 current_index = -1
         except AttributeError:
