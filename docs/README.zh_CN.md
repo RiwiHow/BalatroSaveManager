@@ -21,3 +21,4 @@
 2. 安装 [PDM](https://github.com/pdm-project/pdm)
 3. 运行 `pdm install`
 4. 运行 `pyinstaller --onefile --name BalatroSaveManager src/main.py`
+5. 将 `config.json` 文件复制到由 pyinstaller 创建的 `dist` 文件夹中。

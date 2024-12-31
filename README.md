@@ -21,3 +21,4 @@ The `config.json` file contains the following settings:
 2. Install [PDM](https://github.com/pdm-project/pdm)
 3. Run `pdm install`
 4. Run `pyinstaller --onefile --name BalatroSaveManager src/main.py`
+5. Copy the `config.json` file to `dist` folder which is created by pyinstaller

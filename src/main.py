@@ -3,7 +3,7 @@ from launch_balatro import launch_balatro
 from read_config import read_config
 
 
-if not read_config()["launch_balatro"]:
+if read_config()["launch_balatro"]:
     launch_balatro()
 
 
