@@ -2,6 +2,7 @@ import os
 import shutil
 from pathlib import Path
 from datetime import datetime
+from screenshot import screenshot
 
 SOURCE_PATH = Path(os.environ["APPDATA"]) / "Balatro" / "1"
 DESTINATION_PATH_ROOT = Path("saves")
@@ -18,6 +19,8 @@ def backup_saves() -> bool:
         dst.mkdir(parents=True, exist_ok=True)
 
         shutil.copytree(src, dst, dirs_exist_ok=True)
+        print(f"{datetime.now().strftime("%m.%d %H%M%S")} save has been backed up.")
+        screenshot("Balatro", dst)
         return True
     except Exception as e:
         print(f"Error copying folder: {str(e)}")

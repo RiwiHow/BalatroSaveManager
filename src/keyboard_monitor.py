@@ -1,8 +1,7 @@
+import time
 from pynput import keyboard
 from pynput.keyboard import Controller
 from save_handler import backup_saves, restore_save, get_sorted_saves
-from datetime import datetime
-import time
 
 
 def keyboard_monitor():
@@ -20,7 +19,6 @@ def keyboard_monitor():
             if key.char == '[':
                 backup_saves()
                 refresh_saves()
-                print(f"{datetime.now().strftime("%m.%d %H%M%S")} save has been backed up.")
                 current_index = -1
         except AttributeError:
             if key == keyboard.Key.up:
