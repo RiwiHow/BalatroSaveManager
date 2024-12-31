@@ -41,6 +41,7 @@ def restore_save(save_path: Path) -> bool:
 
 def delete_saves() -> bool:
     try:
+        print("Deleting all saves!")
         for item in DESTINATION_PATH_ROOT.iterdir():
             if item.is_dir():
                 shutil.rmtree(item)
