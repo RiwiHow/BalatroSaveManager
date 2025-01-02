@@ -1,8 +1,8 @@
 import time
 from pynput import keyboard
+from read_config import KeyMapping
 from pynput.keyboard import Controller
 from save_handler import backup_saves, restore_save, get_sorted_saves, delete_saves, refresh_saves
-from read_config import KeyMapping
 
 
 class KeyboardHandler:
