@@ -22,7 +22,7 @@ def backup_saves() -> bool:
         shutil.copytree(src, dst, dirs_exist_ok=True)
         print(f"{datetime.now().strftime("%m.%d %H%M%S")} save has been backed up.")
         if read_config()["screenshot_enable"]:
-            screenshot("Balatro", dst)
+            screenshot(dst)
 
         return True
     except Exception as e:
@@ -41,12 +41,12 @@ def restore_save(save_path: Path) -> bool:
 
 def delete_saves() -> bool:
     try:
-        print("Deleting all saves!")
         for item in DESTINATION_PATH_ROOT.iterdir():
             if item.is_dir():
                 shutil.rmtree(item)
             else:
                 item.unlink()
+        print("All saves have been deleted.")
         return True
     except Exception as e:
         print(f"Error deleting saves: {str(e)}")

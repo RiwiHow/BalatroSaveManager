@@ -33,9 +33,9 @@ class KeyboardHandler:
             elif key == keyboard.Key.enter:
                 self.saves = get_sorted_saves()
                 if self.saves and 0 <= self.current_index < len(self.saves):
-                    print(f"Restoring save: {
-                          self.saves[self.current_index].name}")
                     restore_save(self.saves[self.current_index])
+                    print(f"The Save: {
+                          self.saves[self.current_index].name} has been restored.")
                     self.current_index = -1
 
                     self.keyboard_controller.press('f')

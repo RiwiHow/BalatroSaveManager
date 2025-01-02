@@ -4,11 +4,11 @@ from PIL import ImageGrab
 from ctypes import windll
 
 
-def screenshot(window_title, save_path):
-    window = win32gui.FindWindow(None, window_title)
+def screenshot(save_path) -> bool:
+    window = win32gui.FindWindow(None, "Balatro")
 
     if not window:
-        print(f"Window '{window_title}' not found!")
+        print("Window 'Balatro' not found!")
         return False
 
     win32gui.SetForegroundWindow(window)
