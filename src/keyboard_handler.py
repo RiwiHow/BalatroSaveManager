@@ -11,7 +11,7 @@ class KeyboardHandler:
         self.saves = []
         self.keyboard_controller = Controller()
         self.listener = keyboard.Listener(
-            on_press=self.on_press, on_release=self.on_release)  # type: ignore
+            on_press=self.on_press)  # type: ignore
 
     def on_press(self, key):
         try:
@@ -42,13 +42,11 @@ class KeyboardHandler:
                     self.keyboard_controller.press('f')
                     time.sleep(0.8)
                     self.keyboard_controller.release('f')
+            elif key == KeyMapping().key_exit():
+                self.stop()
+                return False
         except AttributeError:
             pass
-
-    def on_release(self, key):
-        if key == KeyMapping().key_exit():
-            self.stop()
-            return False
 
     def start(self):
         self.listener.start()
