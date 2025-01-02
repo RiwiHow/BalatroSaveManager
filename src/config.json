@@ -1,4 +1,12 @@
 {
     "screenshot_enable": true,
-    "launch_balatro": false
+    "launch_balatro": false,
+    "key_mapping":
+    {
+        "backup": "[", 
+        "delete": "e",
+        "select": "up",
+        "load": "enter",
+        "exit": "esc"
+    }
 }

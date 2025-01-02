@@ -2,10 +2,11 @@ import time
 from pynput import keyboard
 from pynput.keyboard import Controller
 from save_handler import backup_saves, restore_save, get_sorted_saves, delete_saves, refresh_saves
+from read_config import KeyMapping
 
 
 class KeyboardHandler:
-    def __init__(self):
+    def __init__(self) -> None:
         self.current_index = -1
         self.saves = []
         self.keyboard_controller = Controller()
@@ -15,22 +16,22 @@ class KeyboardHandler:
     def on_press(self, key):
         try:
             if hasattr(key, 'char'):
-                if key.char == "[":
+                if key.char == KeyMapping().key_backup():
                     backup_saves()
                     refresh_saves()
                     self.current_index = -1
-                elif key.char == "e":
+                elif key.char == KeyMapping().key_delete():
                     delete_saves()
                     refresh_saves()
                     self.current_index = -1
-            elif key == keyboard.Key.up:
+            elif key == KeyMapping().key_select():
                 self.saves = get_sorted_saves()
                 if refresh_saves():
                     self.current_index = (
                         self.current_index + 1) % len(self.saves)
                     print(f"Selected save: {
                           self.saves[self.current_index].name}")
-            elif key == keyboard.Key.enter:
+            elif key == KeyMapping().key_load():
                 self.saves = get_sorted_saves()
                 if self.saves and 0 <= self.current_index < len(self.saves):
                     restore_save(self.saves[self.current_index])
@@ -45,7 +46,7 @@ class KeyboardHandler:
             pass
 
     def on_release(self, key):
-        if key == keyboard.Key.esc:
+        if key == KeyMapping().key_exit():
             self.stop()
             return False
 
