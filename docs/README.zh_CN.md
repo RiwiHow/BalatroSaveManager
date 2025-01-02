@@ -7,12 +7,19 @@
 - 按 `[` 复制存档
 - 按 `↑` 选择一个存档，然后按 `Enter` 加载选中的存档
 - 按 `e` 删除所有的存档
+- 配置 `config.json` 自定义按键映射
 - 要自动加载选中的存档，请使用 [BalatroQuickLoad](https://github.com/TsunamiinFantasy/BalatroQuickLoad)。
 
 ## 配置
 `config.json` 文件包含以下设置：
 - `screenshot_enable`: 开启或关闭备份存档时的截屏功能
 - `launch_balatro`: 运行 BalatroSaveManager 时是否自动启动 Balatro
+- `key_mapping`: 自定义按键映射
+    - `backup`: 备份当前存档（默认键：`[`）
+    - `delete`: 删除所有存档（默认键：`e`）
+    - `select`: 选择上一个存档（默认键：`up`）
+    - `load`: 加载所选存档（默认键：`enter`）
+    - `exit`: 退出 BalatroSaveManager（默认键：`esc`）
 
 ## 已知问题及解决办法
 - 截屏功能仅适用于 Windows。然而，在某些情况下，它可能会遇到问题，无法捕捉实时屏幕。如果您遇到这个问题，可以在 `选项 -> 设置 -> 视频` 中将 Balatro 的 `窗口模式（Windows Mode）` 更改为 `窗口模式（Windowed）`
