@@ -53,10 +53,15 @@ def delete_saves() -> bool:
         return False
 
 
-def get_sorted_saves():
+def get_sorted_saves() -> list:
     dst = DESTINATION_PATH_ROOT
     if not dst.exists():
         return []
     saves = [(d, d.stat().st_birthtime)
              for d in dst.iterdir() if d.is_dir()]  # d for directory
     return [d[0] for d in sorted(saves, key=lambda x: x[1], reverse=True)]
+
+
+def refresh_saves() -> bool:
+    saves = get_sorted_saves()
+    return len(saves) > 0
