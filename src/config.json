@@ -1,9 +1,8 @@
 {
     "screenshot_enable": true,
     "launch_balatro": false,
-    "key_mapping":
-    {
-        "backup": "[", 
+    "key_mapping": {
+        "backup": "[",
         "delete": "e",
         "select": "up",
         "load": "enter",

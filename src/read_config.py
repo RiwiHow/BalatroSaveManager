@@ -2,13 +2,54 @@ import json
 from pynput import keyboard
 
 
-def read_config() -> dict:
-    return json.load(open("config.json", encoding="utf-8"))
+class ConfigReader:
+    def __init__(self) -> None:
+        self.config_file = "config.json"
+        self.config = {
+            "screenshot_enable": True,
+            "launch_balatro": False,
+            "key_mapping":
+            {
+                "backup": "[",
+                "delete": "e",
+                "select": "up",
+                "load": "enter",
+                "exit": "esc"
+            }
+        }
+
+    def validate_key_mapping(self) -> list:
+        missing_keys = []
+        required_keys = ["backup", "delete", "select", "load", "exit"]
+
+        for key in required_keys:
+            if not self.config["key_mapping"].get(key):
+                missing_keys.append(key)
+
+        return missing_keys
+
+    def write_config(self) -> dict:
+        with open(self.config_file, "w", encoding="utf-8") as f:
+            json.dump(self.config, f, indent=4)
+        return self.config
+
+    def read_config(self) -> dict:
+        try:
+            missing_keys = self.validate_key_mapping()
+            if missing_keys:
+                print(f"Warning: Missing key mappings for: {', '.join(missing_keys)}, using default keys")
+                return self.config
+            else:
+                return json.load(open("config.json", encoding="utf-8"))
+        except FileNotFoundError:
+            return self.write_config()
+        except json.JSONDecodeError:
+            return self.write_config()
 
 
 class KeyMapping:
     def __init__(self) -> None:
-        self.config = read_config()
+        self.config = ConfigReader().read_config()
         self.special_keys = {
             "up": keyboard.Key.up,
             "down": keyboard.Key.down,

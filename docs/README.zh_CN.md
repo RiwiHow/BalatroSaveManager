@@ -12,8 +12,8 @@
 
 ## 配置
 `config.json` 文件包含以下设置：
-- `screenshot_enable`: 开启或关闭备份存档时的截屏功能
-- `launch_balatro`: 运行 BalatroSaveManager 时是否自动启动 Balatro
+- `screenshot_enable`: 开启或关闭备份存档时的截屏功能（默认：`true`）
+- `launch_balatro`: 运行 BalatroSaveManager 时是否自动启动 Balatro（默认：`false`）
 - `key_mapping`: 自定义按键映射
     - `backup`: 备份当前存档（默认键：`[`）
     - `delete`: 删除所有存档（默认键：`e`）

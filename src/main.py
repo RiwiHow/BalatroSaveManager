@@ -1,9 +1,9 @@
 from keyboard_handler import KeyboardHandler
 from launch_balatro import launch_balatro
-from read_config import read_config
+from read_config import ConfigReader
 
 
-if read_config()["launch_balatro"]:
+if ConfigReader().read_config().get("launch_balatro", False):
     launch_balatro()
 
 

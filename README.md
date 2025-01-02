@@ -12,8 +12,8 @@ A simple tool to manager Balatro saves.
 
 ## Configuration
 The `config.json` file contains the following settings:
-- `screenshot_enable`: Enable/disable the screenshot feature when backing up saves
-- `launch_balatro`: Whether to automatically launch Balatro when running BalatroSaveManager
+- `screenshot_enable`: Enable/disable the screenshot feature when backing up saves (default: `true`)
+- `launch_balatro`: Whether to automatically launch Balatro when running BalatroSaveManager (default: `false`)
 - `key_mapping`: Use your favorite key to perform specific action
     - `backup`: Backup current save (default: `[`)
     - `delete`: Delete all saves (default: `e`)

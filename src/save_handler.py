@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 from datetime import datetime
 from screenshot import screenshot
-from read_config import read_config
+from read_config import ConfigReader
 
 SOURCE_PATH = Path(os.environ["APPDATA"]) / "Balatro" / "1"
 DESTINATION_PATH_ROOT = Path("saves")
@@ -21,7 +21,7 @@ def backup_saves() -> bool:
 
         shutil.copytree(src, dst, dirs_exist_ok=True)
         print(f"{datetime.now().strftime("%m.%d %H%M%S")} save has been backed up.")
-        if read_config()["screenshot_enable"]:
+        if ConfigReader().read_config().get("screenshot_enable", True):
             screenshot(dst)
 
         return True
