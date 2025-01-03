@@ -14,7 +14,7 @@ class KeyboardHandler:
         self.keyboard_controller = Controller()
         self.listener = keyboard.Listener(
             on_press=self.on_press,
-            suppress=False)  # 添加 suppress=False 确保不阻止其他程序接收按键
+            suppress=False)
         self.gui = GUI()
         self.running = True
 
@@ -50,7 +50,6 @@ class KeyboardHandler:
             elif key == KeyMapping().key_exit():
                 self.running = False
                 self.stop()
-                # 使用 after 方法确保在主线程中安全退出
                 self.gui.root.after(100, self.gui.root.quit)
                 return False
         except AttributeError:

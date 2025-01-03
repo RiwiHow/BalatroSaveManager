@@ -8,6 +8,7 @@ class ConfigReader:
         self.config = {
             "screenshot_enable": True,
             "launch_balatro": False,
+            "window_opacity": 0.5,
             "key_mapping":
             {
                 "backup": "[",

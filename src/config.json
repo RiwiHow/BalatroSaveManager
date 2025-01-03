@@ -1,6 +1,8 @@
 {
     "screenshot_enable": true,
     "launch_balatro": false,
+    "window_opacity": 0.5,
+    "always_on_top": true,
     "key_mapping": {
         "backup": "[",
         "delete": "e",
