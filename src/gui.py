@@ -20,7 +20,9 @@ class GUI:
 
             window_pos = config["GUI"].get(
                 'window_position', {'x': 100, 'y': 100})
-            self.root.geometry(f"400x150+{window_pos['x']}+{window_pos['y']}")
+            width = config["GUI"]["window_size"].get("width", 400)
+            height = config["GUI"]["window_size"].get("height", 150)
+            self.root.geometry(f"{width}x{height}+{window_pos['x']}+{window_pos['y']}")
 
             self.root.title("Balatro Save Manager")
 

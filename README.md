@@ -17,6 +17,7 @@ The `config.json` file contains the following settings:
 - `GUI`: Controls the appearance and behavior of the application window
     - `window_opacity`: Controls the transparency of the window (range: `0.0` to `1.0`) (default: `0.8`)
     - `always_on_top`: Determines if the window stays above other windows (default: `true`)
+    - `window_size`: Sets the default window width and height (default: `width = 400`, `height = 150`)
     - `window_position`: Sets the window position on screen. There is no need to change it manually
 - `key_mapping`: Use your favorite key to perform specific action
     - `backup`: Backup current save (default: `[`)
