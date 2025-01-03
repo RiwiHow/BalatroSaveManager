@@ -1,9 +1,11 @@
 import os
 import shutil
+from gui import GUI
 from pathlib import Path
 from datetime import datetime
 from screenshot import screenshot
 from read_config import ConfigReader
+
 
 SOURCE_PATH = Path(os.environ["APPDATA"]) / "Balatro" / "1"
 DESTINATION_PATH_ROOT = Path("saves")
@@ -15,18 +17,18 @@ def backup_saves() -> bool:
         dst = Path(DESTINATION_PATH_ROOT) / datetime.now().strftime("%m.%d %H%M%S")
 
         if not src.exists():
-            print("Please run Balatro once.")
+            GUI().show_message("Please run Balatro once.")
             return False
         dst.mkdir(parents=True, exist_ok=True)
 
         shutil.copytree(src, dst, dirs_exist_ok=True)
-        print(f"{datetime.now().strftime("%m.%d %H%M%S")} save has been backed up.")
+        GUI().show_message(f"{datetime.now().strftime('%m.%d %H%M%S')} save has been backed up.")
         if ConfigReader().read_config().get("screenshot_enable", True):
             screenshot(dst)
 
         return True
     except Exception as e:
-        print(f"Error copying folder: {str(e)}")
+        GUI().show_message(f"Error copying folder: {str(e)}")
         return False
 
 
@@ -35,7 +37,7 @@ def restore_save(save_path: Path) -> bool:
         shutil.copytree(save_path, SOURCE_PATH, dirs_exist_ok=True)
         return True
     except Exception as e:
-        print(f"Error restoring save: {str(e)}")
+        GUI().show_message(f"Error restoring save: {str(e)}")
         return False
 
 
@@ -46,10 +48,10 @@ def delete_saves() -> bool:
                 shutil.rmtree(item)
             else:
                 item.unlink()
-        print("All saves have been deleted.")
+        GUI().show_message("All saves have been deleted.")
         return True
     except Exception as e:
-        print(f"Error deleting saves: {str(e)}")
+        GUI().show_message(f"Error deleting saves: {str(e)}")
         return False
 
 
