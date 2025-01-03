@@ -8,9 +8,15 @@ class ConfigReader:
         self.config = {
             "screenshot_enable": True,
             "launch_balatro": False,
-            "window_opacity": 0.5,
-            "key_mapping":
-            {
+            "GUI": {
+                "window_opacity": 0.8,
+                "always_on_top": True,
+                "window_position": {
+                    "x": 100,
+                    "y": 100
+                }
+            },
+            "key_mapping": {
                 "backup": "[",
                 "delete": "e",
                 "select": "up",
@@ -38,7 +44,8 @@ class ConfigReader:
         try:
             missing_keys = self.validate_key_mapping()
             if missing_keys:
-                print(f"Warning: Missing key mappings for: {', '.join(missing_keys)}, using default keys")
+                print(f"Warning: Missing key mappings for: {
+                      ', '.join(missing_keys)}, using default keys")
                 return self.config
             else:
                 return json.load(open("config.json", encoding="utf-8"))

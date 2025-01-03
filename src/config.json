@@ -1,8 +1,14 @@
 {
     "screenshot_enable": true,
     "launch_balatro": false,
-    "window_opacity": 0.5,
-    "always_on_top": true,
+    "GUI": {
+        "window_opacity": 0.8,
+        "always_on_top": true,
+        "window_position": {
+            "x": 959,
+            "y": 347
+        }
+    },
     "key_mapping": {
         "backup": "[",
         "delete": "e",

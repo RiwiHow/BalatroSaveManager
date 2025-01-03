@@ -14,6 +14,10 @@
 `config.json` 文件包含以下设置：
 - `screenshot_enable`: 开启或关闭备份存档时的截屏功能（默认：`true`）
 - `launch_balatro`: 运行 BalatroSaveManager 时是否自动启动 Balatro（默认：`false`）
+- `GUI`: 控制窗口的外观和行为
+    - `window_opacity`: 控制窗口的透明度（范围：`0.0` 到 `1.0`）（默认值：`0.8`）
+    - `always_on_top`: 是否始终置顶（默认值：`true`）
+    - `window_position`: 设置窗口在屏幕上的位置。无需手动更改
 - `key_mapping`: 自定义按键映射
     - `backup`: 备份当前存档（默认键：`[`）
     - `delete`: 删除所有存档（默认键：`e`）
@@ -23,10 +27,11 @@
 
 ## 已知问题及解决办法
 - 截屏功能仅适用于 Windows。然而，在某些情况下，它可能会遇到问题，无法捕捉实时屏幕。如果您遇到这个问题，可以在 `选项 -> 设置 -> 视频` 中将 Balatro 的 `窗口模式（Windows Mode）` 更改为 `窗口模式（Windowed）`
+- GUI 的始终置顶功能在有多台显示器的电脑上的某些显示器不生效.请切换显示器，或者把 Balatro 的 `窗口模式（Windows Mode）` 更改为 `窗口模式（Windowed）`
 
 ## 构建
 1. 运行 `git clone https://github.com/RiwiHow/BalatroSaveManager.git`
 2. 安装 [PDM](https://github.com/pdm-project/pdm)
 3. 运行 `pdm install`
-4. 运行 `pyinstaller --onefile --name BalatroSaveManager src/main.py`
+4. 运行 `pyinstaller --onefile --noconsole --name BalatroSaveManager src\main.py`
 5. 将 `config.json` 文件复制到由 pyinstaller 创建的 `dist` 文件夹中
