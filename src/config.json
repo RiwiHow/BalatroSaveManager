@@ -5,8 +5,8 @@
         "window_opacity": 0.8,
         "always_on_top": true,
         "window_position": {
-            "x": 959,
-            "y": 347
+            "x": 100,
+            "y": 100
         }
     },
     "key_mapping": {
