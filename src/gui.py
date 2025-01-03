@@ -18,7 +18,8 @@ class GUI:
             self.config_reader = ConfigReader()
             config = self.config_reader.read_config()
 
-            window_pos = config["GUI"].get('window_position', {'x': 100, 'y': 100})
+            window_pos = config["GUI"].get(
+                'window_position', {'x': 100, 'y': 100})
             self.root.geometry(f"400x150+{window_pos['x']}+{window_pos['y']}")
 
             self.root.title("Balatro Save Manager")
