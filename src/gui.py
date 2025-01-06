@@ -44,9 +44,17 @@ class GUI:
         self.root.attributes(
             '-topmost', config["GUI"].get('always_on_top', True))
 
+        # Create a frame for drag area - remove padding here
+        self.drag_frame = tk.Frame(self.root)
+        self.drag_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Create inner frame for content with padding
+        self.content_frame = tk.Frame(self.drag_frame)
+        self.content_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+
         # Create save list with custom style
         self.save_list = tk.Listbox(
-            self.root,
+            self.content_frame,  # Changed parent to content_frame
             height=5,
             selectmode=tk.SINGLE,
             borderwidth=0,  # Remove border
@@ -54,17 +62,35 @@ class GUI:
             activestyle='none'  # Remove the underline from the selected item
         )
         self.save_list.pack(side=tk.LEFT, fill=tk.BOTH,
-                            expand=True, padx=10, pady=10)
+                            expand=True)
+
+        # Create custom scrollbar style
+        style = ttk.Style()
+        style.layout('Vertical.TScrollbar',
+                     [('Vertical.Scrollbar.trough',
+                       {'children':
+                        [('Vertical.Scrollbar.thumb',
+                          {'expand': '1', 'sticky': 'nswe'})],
+                           'sticky': 'ns'})])
+
+        # Optionally configure colors and other properties
+        style.configure('Vertical.TScrollbar',
+                        troughcolor='#F0F0F0',
+                        background='#C0C0C0',
+                        relief='flat',
+                        arrowsize=10)
 
         # Create Scrollbar
-        self.scrollbar = ttk.Scrollbar(self.root, style='Vertical.TScrollbar')
-        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
+        self.scrollbar = ttk.Scrollbar(
+            self.content_frame,
+            style='Vertical.TScrollbar')
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.save_list.config(yscrollcommand=self.on_scroll)
-        # self.scrollbar.config(command=self.save_list.yview)
+        self.scrollbar.config(command=self.save_list.yview)
 
-        # Bind drag events directly to the root window
-        self.root.bind('<Button-1>', self.start_move)
-        self.root.bind('<B1-Motion>', self.do_move)
+        # Bind drag events to frame instead of scrollbar
+        self.drag_frame.bind('<Button-1>', self.start_move)
+        self.drag_frame.bind('<B1-Motion>', self.do_move)
 
         # Bind keyboard events
         self.root.bind('<Return>', self.restore_selected_save)
@@ -99,7 +125,7 @@ class GUI:
         for save in saves:
             if save.name == save_name:
                 if restore_save(save):
-                    self.show_message(f"Restored save: {save_name}")
+                    print(f"Restored save: {save_name}")
                 break
 
     def select_previous(self, event=None):
@@ -141,11 +167,6 @@ class GUI:
         config["GUI"]['window_position'] = {'x': x, 'y': y}
         self.config_reader.config = config
         self.config_reader.write_config()
-
-    def show_message(self, message: str):
-        self.root.title(message)
-        self.root.update()
-        self.root.after(2000, lambda: self.root.title("Balatro Save Manager"))
 
     def on_motion(self, event):
         index = self.save_list.nearest(event.y)

@@ -10,10 +10,6 @@ class EventManager:
     def set_gui(self, gui):
         self.gui = gui
 
-    def show_message(self, message: str):
-        if self.gui:
-            self.gui.show_message(message)
-
     def refresh_save_list(self):
         if self.gui:
             self.gui.refresh_save_list()
