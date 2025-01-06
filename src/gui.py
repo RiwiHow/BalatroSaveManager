@@ -20,56 +20,51 @@ class GUI:
             return
         GUI._initialized = True
 
+        # Declaration of a class variable
         self.root = tk.Tk()
         EventManager().set_gui(self)
         self.config_reader = ConfigReader()
         config = self.config_reader.read_config()
+        self.screen_width = self.root.winfo_screenwidth()
 
+        # Set windows position and size
         window_pos = config["GUI"].get(
             'window_position', {'x': 100, 'y': 100})
-        width = config["GUI"]["window_size"].get("width", 250)  # 减小宽度
+        width = config["GUI"]["window_size"].get("width", 250)
         height = config["GUI"]["window_size"].get("height", 150)
-        self.root.geometry(f"{width}x{height}+{window_pos['x']}+{window_pos['y']}")
+        self.root.geometry(
+            f"{width}x{height}+{window_pos['x']}+{window_pos['y']}")
 
-        self.root.title("Balatro Save Manager")
-
-        # Remove title bar
-        self.root.overrideredirect(True)
+        # Windows attributes
+        self.root.overrideredirect(True)  # Remove title bar
         # Set transparency
         self.root.attributes(
             '-alpha', config["GUI"].get('window_opacity', 0.8))
-
         # Always on top
         self.root.attributes(
             '-topmost', config["GUI"].get('always_on_top', True))
 
-        # Bind drag events directly to the root window
-        self.root.bind('<Button-1>', self.start_move)
-        self.root.bind('<B1-Motion>', self.do_move)
-
         # Create save list with custom style
         self.save_list = tk.Listbox(
             self.root,
-            height=8,
+            height=5,
             selectmode=tk.SINGLE,
-            borderwidth=0,  # 移除边框
-            highlightthickness=0,  # 移除高亮边框
-            activestyle='none'  # 移除选中项的下划线
+            borderwidth=0,  # Remove border
+            highlightthickness=0,  # Remove the highlight border
+            activestyle='none'  # Remove the underline from the selected item
         )
-        self.save_list.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.save_list.pack(side=tk.LEFT, fill=tk.BOTH,
+                            expand=True, padx=10, pady=10)
 
-        # 创建不可见的滚动条
-        list_scrollbar = ttk.Scrollbar(self.root, style='Vertical.TScrollbar')
-        list_scrollbar.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
+        # Create Scrollbar
+        self.scrollbar = ttk.Scrollbar(self.root, style='Vertical.TScrollbar')
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
         self.save_list.config(yscrollcommand=self.on_scroll)
-        list_scrollbar.config(command=self.save_list.yview)
+        # self.scrollbar.config(command=self.save_list.yview)
 
-        # 保存滚动条引用以便后续使用
-        self.scrollbar = list_scrollbar
-
-        # 创建自定义样式
-        style = ttk.Style()
-        style.layout('Vertical.TScrollbar', [])  # 移除滚动条所有可见元素
+        # Bind drag events directly to the root window
+        self.root.bind('<Button-1>', self.start_move)
+        self.root.bind('<B1-Motion>', self.do_move)
 
         # Bind keyboard events
         self.root.bind('<Return>', self.restore_selected_save)
@@ -88,9 +83,6 @@ class GUI:
 
         # Initial save list update
         self.refresh_save_list()
-
-        # 获取屏幕宽度
-        self.screen_width = self.root.winfo_screenwidth()
 
     def refresh_save_list(self):
         self.save_list.delete(0, tk.END)
@@ -158,20 +150,14 @@ class GUI:
     def on_motion(self, event):
         index = self.save_list.nearest(event.y)
         if 0 <= index < len(self.saves):
-            # 获取主窗口位置和大小
             window_x = self.root.winfo_x()
             window_width = self.root.winfo_width()
-            preview_width = 400  # 预览窗口宽度
-
-            # 计算预览窗口的Y坐标（保持不变）
+            preview_width = 400
             y = self.root.winfo_y() + event.y
 
-            # 根据主窗口位置决定预览窗口显示在左边还是右边
             if window_x + window_width + preview_width + 10 > self.screen_width:
-                # 如果右边放不下，就放在左边
                 x = window_x - preview_width - 10
             else:
-                # 否则放在右边
                 x = window_x + window_width + 10
 
             self.preview_window.show(self.saves[index], x, y)
@@ -180,7 +166,6 @@ class GUI:
         self.preview_window.hide()
 
     def on_scroll(self, *args):
-        # 滚动时更新滚动条位置，但保持不可见
         self.scrollbar.set(*args)
 
     def start(self):
