@@ -5,12 +5,12 @@
         "window_opacity": 0.8,
         "always_on_top": true,
         "window_size": {
-            "width": 400,
+            "width": 250,
             "height": 150
         },
         "window_position": {
-            "x": 100,
-            "y": 100
+            "x": 543,
+            "y": 362
         }
     },
     "key_mapping": {

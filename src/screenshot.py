@@ -1,15 +1,15 @@
 import os
 import win32gui
-from gui import GUI
 from PIL import ImageGrab
 from ctypes import windll
+from event_manager import EventManager
 
 
 def screenshot(save_path) -> bool:
     window = win32gui.FindWindow(None, "Balatro")
 
     if not window:
-        GUI().show_message("Window 'Balatro' not found!")
+        EventManager().show_message("Window 'Balatro' not found!")
         return False
 
     win32gui.SetForegroundWindow(window)
@@ -27,5 +27,5 @@ def screenshot(save_path) -> bool:
 
         return True
     except Exception as e:
-        GUI().show_message(f"Screenshot failed: {e}")
+        EventManager().show_message(f"Screenshot failed: {e}")
         return False

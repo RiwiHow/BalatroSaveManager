@@ -1,10 +1,10 @@
 import os
 import shutil
-from gui import GUI
 from pathlib import Path
 from datetime import datetime
 from screenshot import screenshot
 from read_config import ConfigReader
+from event_manager import EventManager
 
 
 SOURCE_PATH = Path(os.environ["APPDATA"]) / "Balatro" / "1"
@@ -17,18 +17,19 @@ def backup_saves() -> bool:
         dst = Path(DESTINATION_PATH_ROOT) / datetime.now().strftime("%m.%d %H%M%S")
 
         if not src.exists():
-            GUI().show_message("Please run Balatro once.")
+            EventManager().show_message("Please run Balatro once.")
             return False
         dst.mkdir(parents=True, exist_ok=True)
 
         shutil.copytree(src, dst, dirs_exist_ok=True)
-        GUI().show_message(f"{datetime.now().strftime('%m.%d %H%M%S')} save has been backed up.")
+        EventManager().show_message(f"{datetime.now().strftime('%m.%d %H%M%S')} save has been backed up.")
         if ConfigReader().read_config().get("screenshot_enable", True):
             screenshot(dst)
 
+        EventManager().refresh_save_list()
         return True
     except Exception as e:
-        GUI().show_message(f"Error copying folder: {str(e)}")
+        EventManager().show_message(f"Error copying folder: {str(e)}")
         return False
 
 
@@ -37,7 +38,7 @@ def restore_save(save_path: Path) -> bool:
         shutil.copytree(save_path, SOURCE_PATH, dirs_exist_ok=True)
         return True
     except Exception as e:
-        GUI().show_message(f"Error restoring save: {str(e)}")
+        EventManager().show_message(f"Error restoring save: {str(e)}")
         return False
 
 
@@ -48,10 +49,11 @@ def delete_saves() -> bool:
                 shutil.rmtree(item)
             else:
                 item.unlink()
-        GUI().show_message("All saves have been deleted.")
+        EventManager().show_message("All saves have been deleted.")
+        EventManager().refresh_save_list()
         return True
     except Exception as e:
-        GUI().show_message(f"Error deleting saves: {str(e)}")
+        EventManager().show_message(f"Error deleting saves: {str(e)}")
         return False
 
 
