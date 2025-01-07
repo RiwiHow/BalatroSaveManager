@@ -64,7 +64,7 @@ class GUI:
             borderwidth=0,  # Remove border
             highlightthickness=0,  # Remove the highlight border
             activestyle='none',  # Remove the underline from the selected item
-            font=('Arial', 20)
+            font=('Arial', config['GUI'].get("font_size", 20))
         )
         self.save_list.configure(
             selectbackground='#4a6984',

@@ -4,13 +4,14 @@
     "GUI": {
         "window_opacity": 0.8,
         "always_on_top": true,
+        "font_size": 20,
         "window_size": {
             "width": 270,
             "height": 400
         },
         "window_position": {
-            "x": 2189,
-            "y": 484
+            "x": 100,
+            "y": 100
         }
     },
     "key_mapping": {

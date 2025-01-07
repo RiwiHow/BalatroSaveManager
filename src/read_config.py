@@ -11,6 +11,11 @@ class ConfigReader:
             "GUI": {
                 "window_opacity": 0.8,
                 "always_on_top": True,
+                "font_size": 20,
+                "window_size": {
+                    "width": 270,
+                    "height": 400
+                },
                 "window_position": {
                     "x": 100,
                     "y": 100
@@ -19,7 +24,7 @@ class ConfigReader:
             "key_mapping": {
                 "backup": "[",
                 "delete": "e",
-                "select": "up",
+                "select": "down",
                 "load": "enter",
                 "exit": "esc"
             }
