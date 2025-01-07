@@ -1,10 +1,10 @@
 import time
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from read_config import ConfigReader
 from event_manager import EventManager
 from preview_window import PreviewWindow
-from save_handler import get_sorted_saves, restore_save
+from save_handler import get_sorted_saves, restore_save, backup_saves, delete_saves
 
 
 class GUI:
@@ -70,8 +70,36 @@ class GUI:
             selectbackground='#4a6984',
             selectforeground='white',
         )
-        self.save_list.pack(side=tk.LEFT, fill=tk.BOTH,
+        self.save_list.pack(side=tk.TOP, fill=tk.BOTH,
                             expand=True)
+
+        # Add button frame
+        self.button_frame = tk.Frame(self.content_frame)
+        self.button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=(10, 0))
+
+        # Create Save button
+        self.save_button = tk.Button(
+            self.button_frame,
+            text="Save",
+            command=self.save_game,
+            bg='#4a6984',
+            fg='white',
+            relief=tk.FLAT,
+            padx=20
+        )
+        self.save_button.pack(side=tk.LEFT, expand=True, padx=5)
+
+        # Create Delete All button
+        self.delete_button = tk.Button(
+            self.button_frame,
+            text="Delete All",
+            command=self.delete_all_saves,
+            bg='#964a4a',
+            fg='white',
+            relief=tk.FLAT,
+            padx=20
+        )
+        self.delete_button.pack(side=tk.LEFT, expand=True, padx=5)
 
         # Create custom scrollbar style
         style = ttk.Style()
@@ -260,6 +288,19 @@ class GUI:
                     keyboard_handler.keyboard_controller.press('f')
                     time.sleep(0.8)
                     keyboard_handler.keyboard_controller.release('f')
+
+    def save_game(self):
+        keyboard_handler = EventManager().keyboard_handler
+        if keyboard_handler:
+            backup_saves()
+
+    def delete_all_saves(self):
+        result = messagebox.askyesno(
+            "Confirm Delete",
+            "Are you sure you want to delete all saves?"
+        )
+        if result:
+            delete_saves()
 
     def start(self):
         self.root.mainloop()

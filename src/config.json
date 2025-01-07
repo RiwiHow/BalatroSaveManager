@@ -2,7 +2,7 @@
     "screenshot_enable": true,
     "launch_balatro": false,
     "GUI": {
-        "window_opacity": 0.8,
+        "window_opacity": 1,
         "always_on_top": true,
         "font_size": 20,
         "window_size": {
