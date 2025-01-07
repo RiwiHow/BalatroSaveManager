@@ -1,7 +1,6 @@
 import os
 import win32gui
 from PIL import ImageGrab
-from ctypes import windll
 
 
 def screenshot(save_path) -> bool:
@@ -12,8 +11,6 @@ def screenshot(save_path) -> bool:
         return False
 
     win32gui.SetForegroundWindow(window)
-    user32 = windll.user32
-    user32.SetProcessDPIAware()
 
     left, top, right, bottom = win32gui.GetWindowRect(window)
 

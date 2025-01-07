@@ -59,7 +59,8 @@ class GUI:
             selectmode=tk.SINGLE,
             borderwidth=0,  # Remove border
             highlightthickness=0,  # Remove the highlight border
-            activestyle='none'  # Remove the underline from the selected item
+            activestyle='none',  # Remove the underline from the selected item
+            font=('Arial', 12)
         )
         self.save_list.pack(side=tk.LEFT, fill=tk.BOTH,
                             expand=True)
@@ -85,7 +86,9 @@ class GUI:
             self.content_frame,
             style='Vertical.TScrollbar')
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-        self.save_list.config(yscrollcommand=self.on_scroll)
+
+        # Ensure Listbox and Scrollbar are correctly bound
+        self.save_list.config(yscrollcommand=self.scrollbar.set)
         self.scrollbar.config(command=self.save_list.yview)
 
         # Bind drag events to frame instead of scrollbar
@@ -99,6 +102,7 @@ class GUI:
 
         # Create preview window
         self.preview_window = PreviewWindow(self.root)
+        self.scaling = self.preview_window.scaling
 
         # Add mouse event bindings for preview
         self.save_list.bind('<Motion>', self.on_motion)
@@ -173,7 +177,7 @@ class GUI:
         if 0 <= index < len(self.saves):
             window_x = self.root.winfo_x()
             window_width = self.root.winfo_width()
-            preview_width = 400
+            preview_width = int(400 * self.scaling)
             y = self.root.winfo_y() + event.y
 
             if window_x + window_width + preview_width + 10 > self.screen_width:
@@ -185,9 +189,6 @@ class GUI:
 
     def on_leave(self, event):
         self.preview_window.hide()
-
-    def on_scroll(self, *args):
-        self.scrollbar.set(*args)
 
     def start(self):
         self.root.mainloop()

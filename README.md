@@ -27,7 +27,6 @@ The `config.json` file contains the following settings:
     - `exit`: Exit BalatroSaveManager (default: `esc`)
 
 ## Known Issues and Workarounds
-- Due to DPI issues, the window may suddenly shrink and move to another position after pressing the `backup` key. Please right-click on this app, click "Properties," go to `Compatibility -> Change high DPI settings -> High DPI scaling override -> Select "Application"`
 - The screenshot feature is only for Windows. However, it may have issues that prevent it from capturing the real-time screen in some cases. If you encounter this problem, you can change Balatro's `Windows Mode` to `Windowed` in `OPTIONS -> Settings -> Video`
 - The always-on-top feature of the GUI is not effective on certain displays when using a multi-monitor setup. Please switch displays or change the Balatro Balatro's `Windows Mode` to `Windowed`
 
