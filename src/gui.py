@@ -83,7 +83,7 @@ class GUI:
 
         # Create Scrollbar
         self.scrollbar = ttk.Scrollbar(
-            self.content_frame,
+            self.save_list,  # Changed from self.content_frame to self.save_list
             style='Vertical.TScrollbar')
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 

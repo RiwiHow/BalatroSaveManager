@@ -7,7 +7,8 @@ from keyboard_handler import KeyboardHandler
 
 def main():
     DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = c_void_p(-4)
-    windll.user32.SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)
+    windll.user32.SetProcessDpiAwarenessContext(
+        DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)
 
     gui = GUI()
     keyboard_handler = KeyboardHandler()
