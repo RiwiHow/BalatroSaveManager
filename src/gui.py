@@ -64,7 +64,7 @@ class GUI:
             borderwidth=0,  # Remove border
             highlightthickness=0,  # Remove the highlight border
             activestyle='none',  # Remove the underline from the selected item
-            font=('Arial', 12)
+            font=('Arial', 20)
         )
         self.save_list.configure(
             selectbackground='#4a6984',
@@ -115,11 +115,20 @@ class GUI:
 
         self.refresh_save_list()
 
+    def format_save_name(self, name: str) -> str:
+        try:
+            date_part, time_part = name.split(' ')
+            formatted_time = f"{time_part[:2]}:{time_part[2:4]}:{time_part[4:]}"
+            return f"{date_part} {formatted_time}"
+        except Exception:
+            return name
+
     def refresh_save_list(self):
         self.save_list.delete(0, tk.END)
         self.saves = get_sorted_saves()
         for save in self.saves:
-            self.save_list.insert(tk.END, save.name)
+            formatted_name = self.format_save_name(save.name)
+            self.save_list.insert(tk.END, formatted_name)
 
     def start_move(self, event):
         self.x = event.x
