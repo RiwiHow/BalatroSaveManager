@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 from tkinter import ttk
 from read_config import ConfigReader
@@ -26,6 +27,9 @@ class GUI:
         self.config_reader = ConfigReader()
         config = self.config_reader.read_config()
         self.screen_width = self.root.winfo_screenwidth()
+        self.saves = []
+        self.last_hover_index = None
+        self.item_height = None
 
         # Set windows position and size
         window_pos = config["GUI"].get(
@@ -62,6 +66,10 @@ class GUI:
             activestyle='none',  # Remove the underline from the selected item
             font=('Arial', 12)
         )
+        self.save_list.configure(
+            selectbackground='#4a6984',
+            selectforeground='white',
+        )
         self.save_list.pack(side=tk.LEFT, fill=tk.BOTH,
                             expand=True)
 
@@ -95,66 +103,23 @@ class GUI:
         self.drag_frame.bind('<Button-1>', self.start_move)
         self.drag_frame.bind('<B1-Motion>', self.do_move)
 
-        # Bind keyboard events
-        self.root.bind('<Return>', self.restore_selected_save)
-        self.root.bind('<Up>', self.select_previous)
-        self.root.bind('<Down>', self.select_next)
-
         # Create preview window
         self.preview_window = PreviewWindow(self.root)
         self.scaling = self.preview_window.scaling
 
-        # Add mouse event bindings for preview
+        # Add mouse event bindings for Listbox
         self.save_list.bind('<Motion>', self.on_motion)
         self.save_list.bind('<Leave>', self.on_leave)
+        self.save_list.bind('<<ListboxSelect>>', self.on_select)
+        self.save_list.bind('<Double-Button-1>', self.on_double_click)
 
-        # Store saves for quick lookup
-        self.saves = []
-
-        # Initial save list update
         self.refresh_save_list()
 
     def refresh_save_list(self):
         self.save_list.delete(0, tk.END)
-        self.saves = get_sorted_saves()  # Store saves
+        self.saves = get_sorted_saves()
         for save in self.saves:
             self.save_list.insert(tk.END, save.name)
-
-    def restore_selected_save(self, event=None):
-        selection = self.save_list.curselection()
-        if not selection:
-            return
-        save_name = self.save_list.get(selection[0])
-        saves = get_sorted_saves()
-        for save in saves:
-            if save.name == save_name:
-                if restore_save(save):
-                    print(f"Restored save: {save_name}")
-                break
-
-    def select_previous(self, event=None):
-        if self.save_list.size() == 0:
-            return
-        try:
-            current = self.save_list.curselection()[0]
-            if current > 0:
-                self.save_list.selection_clear(0, tk.END)
-                self.save_list.selection_set(current - 1)
-                self.save_list.see(current - 1)
-        except IndexError:
-            self.save_list.selection_set(0)
-
-    def select_next(self, event=None):
-        if self.save_list.size() == 0:
-            return
-        try:
-            current = self.save_list.curselection()[0]
-            if current < self.save_list.size() - 1:
-                self.save_list.selection_clear(0, tk.END)
-                self.save_list.selection_set(current + 1)
-                self.save_list.see(current + 1)
-        except IndexError:
-            self.save_list.selection_set(0)
 
     def start_move(self, event):
         self.x = event.x
@@ -172,9 +137,58 @@ class GUI:
         self.config_reader.config = config
         self.config_reader.write_config()
 
+    def get_real_item_at(self, y_position):
+        if self.item_height is None and self.save_list.size() > 0:
+            bbox = self.save_list.bbox(0)
+            if bbox:
+                self.item_height = bbox[3]
+
+        if self.item_height:
+            first_visible = self.save_list.nearest(0)
+            relative_y = y_position
+            item_index = first_visible + int(relative_y / self.item_height)
+
+            if 0 <= item_index < self.save_list.size():
+                bbox = self.save_list.bbox(item_index)
+                if bbox:
+                    item_top = bbox[1]
+                    item_bottom = item_top + bbox[3]
+                    if item_top <= y_position <= item_bottom:
+                        return item_index
+        return None
+
     def on_motion(self, event):
-        index = self.save_list.nearest(event.y)
-        if 0 <= index < len(self.saves):
+        current_index = self.get_real_item_at(event.y)
+
+        if current_index is None:
+            if self.last_hover_index is not None:
+                self.save_list.itemconfig(
+                    self.last_hover_index,
+                    background='',
+                    foreground=''
+                )
+                self.last_hover_index = None
+            self.preview_window.hide()
+            return
+
+        if self.last_hover_index != current_index:
+            if self.last_hover_index is not None:
+                self.save_list.itemconfig(
+                    self.last_hover_index,
+                    background='',
+                    foreground=''
+                )
+
+            if current_index not in self.save_list.curselection():
+                self.save_list.itemconfig(
+                    current_index,
+                    background='#2a3f52',
+                    foreground='white'
+                )
+
+            self.last_hover_index = current_index
+
+        if 0 <= current_index < len(self.saves):
             window_x = self.root.winfo_x()
             window_width = self.root.winfo_width()
             preview_width = int(400 * self.scaling)
@@ -185,10 +199,58 @@ class GUI:
             else:
                 x = window_x + window_width + 10
 
-            self.preview_window.show(self.saves[index], x, y)
+            self.preview_window.show(self.saves[current_index], x, y)
 
     def on_leave(self, event):
+        if self.last_hover_index is not None:
+            self.save_list.itemconfig(
+                self.last_hover_index,
+                background='',
+                foreground=''
+            )
+            self.last_hover_index = None
+
         self.preview_window.hide()
+
+    def update_selection(self, index):
+        if self.last_hover_index is not None:
+            self.save_list.itemconfig(
+                self.last_hover_index,
+                background='',
+                foreground=''
+            )
+            self.last_hover_index = None
+
+        self.save_list.selection_clear(0, tk.END)
+        if index >= 0:
+            self.save_list.selection_set(index)
+            self.save_list.see(index)
+
+    def on_select(self, event):
+        selection = self.save_list.curselection()
+        if selection:
+            index = selection[0]
+            keyboard_handler = EventManager().keyboard_handler
+            if keyboard_handler:
+                keyboard_handler.current_index = index
+
+    def on_double_click(self, event):
+        selection = self.save_list.curselection()
+        if selection:
+            index = selection[0]
+            keyboard_handler = EventManager().keyboard_handler
+            if keyboard_handler:
+                keyboard_handler.current_index = index
+                keyboard_handler.saves = get_sorted_saves()
+                if (keyboard_handler.saves and 0 <= keyboard_handler.current_index < len(keyboard_handler.saves)):
+                    restore_save(
+                        keyboard_handler.saves[keyboard_handler.current_index])
+                    print(f"The Save: {
+                          keyboard_handler.saves[keyboard_handler.current_index].name} has been restored.")
+
+                    keyboard_handler.keyboard_controller.press('f')
+                    time.sleep(0.8)
+                    keyboard_handler.keyboard_controller.release('f')
 
     def start(self):
         self.root.mainloop()
