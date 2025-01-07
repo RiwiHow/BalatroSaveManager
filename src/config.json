@@ -2,11 +2,12 @@
     "screenshot_enable": true,
     "launch_balatro": false,
     "GUI": {
-        "window_opacity": 0.8,
+        "window_opacity": 1,
         "always_on_top": true,
+        "font_size": 15,
         "window_size": {
-            "width": 400,
-            "height": 150
+            "width": 270,
+            "height": 400
         },
         "window_position": {
             "x": 100,
@@ -16,7 +17,7 @@
     "key_mapping": {
         "backup": "[",
         "delete": "e",
-        "select": "up",
+        "select": "down",
         "load": "enter",
         "exit": "esc"
     }

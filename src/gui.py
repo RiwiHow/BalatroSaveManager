@@ -1,11 +1,16 @@
+import time
 import tkinter as tk
-from tkinter import ttk
-from datetime import datetime
+import win32gui
+from tkinter import ttk, messagebox
 from read_config import ConfigReader
+from event_manager import EventManager
+from preview_window import PreviewWindow
+from save_handler import get_sorted_saves, restore_save, backup_saves, delete_saves
 
 
 class GUI:
     _instance = None
+    _initialized = False
 
     def __new__(cls):
         if cls._instance is None:
@@ -13,62 +18,146 @@ class GUI:
         return cls._instance
 
     def __init__(self):
-        if not hasattr(self, 'root'):
-            self.root = tk.Tk()
-            self.config_reader = ConfigReader()
-            config = self.config_reader.read_config()
+        if GUI._initialized:
+            return
+        GUI._initialized = True
 
-            window_pos = config["GUI"].get(
-                'window_position', {'x': 100, 'y': 100})
-            width = config["GUI"]["window_size"].get("width", 400)
-            height = config["GUI"]["window_size"].get("height", 150)
-            self.root.geometry(f"{width}x{height}+{window_pos['x']}+{window_pos['y']}")
+        # Declaration of a class variable
+        self.root = tk.Tk()
+        EventManager().set_gui(self)
+        self.config_reader = ConfigReader()
+        config = self.config_reader.read_config()
+        self.screen_width = self.root.winfo_screenwidth()
+        self.saves = []
+        self.last_hover_index = None
+        self.item_height = None
 
-            self.root.title("Balatro Save Manager")
+        # Set windows position and size
+        window_pos = config["GUI"].get(
+            'window_position', {'x': 100, 'y': 100})
+        width = config["GUI"]["window_size"].get("width", 250)
+        height = config["GUI"]["window_size"].get("height", 150)
+        self.root.geometry(
+            f"{width}x{height}+{window_pos['x']}+{window_pos['y']}")
 
-            # Remove title bar
-            self.root.overrideredirect(True)
-            # Set transparency
-            self.root.attributes(
-                '-alpha', config["GUI"].get('window_opacity', 0.8))
+        # Windows attributes
+        self.root.overrideredirect(True)  # Remove title bar
+        # Set transparency
+        self.root.attributes(
+            '-alpha', config["GUI"].get('window_opacity', 0.8))
+        # Always on top
+        self.root.attributes(
+            '-topmost', config["GUI"].get('always_on_top', True))
 
-            # Always on top
-            self.root.attributes(
-                '-topmost', config["GUI"].get('always_on_top', True))
+        # Create a frame for drag area - remove padding here
+        self.drag_frame = tk.Frame(self.root)
+        self.drag_frame.pack(fill=tk.BOTH, expand=True)
 
-            # Bind drag events directly to the root window
-            self.root.bind('<Button-1>', self.start_move)
-            self.root.bind('<B1-Motion>', self.do_move)
+        # Create inner frame for content with padding
+        self.content_frame = tk.Frame(self.drag_frame)
+        self.content_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-            bg_color = self.root.cget('bg')
+        # Create save list with custom style
+        self.save_list = tk.Listbox(
+            self.content_frame,  # Changed parent to content_frame
+            height=5,
+            selectmode=tk.SINGLE,
+            borderwidth=0,  # Remove border
+            highlightthickness=0,  # Remove the highlight border
+            activestyle='none',  # Remove the underline from the selected item
+            font=('Arial', config['GUI'].get("font_size", 20))
+        )
+        self.save_list.configure(
+            selectbackground='#4a6984',
+            selectforeground='white',
+        )
+        self.save_list.pack(side=tk.TOP, fill=tk.BOTH,
+                            expand=True)
 
-            self.text_area = tk.Text(
-                self.root,
-                wrap=tk.WORD,
-                height=15,
-                cursor="arrow",
-                selectbackground=bg_color,
-                selectforeground=bg_color,
-                inactiveselectbackground=bg_color,
-                takefocus=0
-            )
-            self.text_area.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+        # Add button frame
+        self.button_frame = tk.Frame(self.content_frame)
+        self.button_frame.pack(side=tk.BOTTOM, fill=tk.X, pady=(10, 0))
 
-            self.text_area.configure(
-                insertwidth=0,
-                highlightthickness=0,
-            )
+        # Create Save button
+        self.save_button = tk.Button(
+            self.button_frame,
+            text="Save",
+            command=self.save_game,
+            bg='#4a6984',
+            fg='white',
+            relief=tk.FLAT,
+            padx=20
+        )
+        self.save_button.pack(side=tk.LEFT, expand=True, padx=5)
 
-            # Disable all text-related events
-            self.text_area.bind('<Key>', lambda e: 'break')
-            self.text_area.bind('<Button-1>', lambda e: self.start_move(e))
-            self.text_area.bind('<B1-Motion>', lambda e: self.do_move(e))
+        # Create Delete All button
+        self.delete_button = tk.Button(
+            self.button_frame,
+            text="Delete All",
+            command=self.delete_all_saves,
+            bg='#964a4a',
+            fg='white',
+            relief=tk.FLAT,
+            padx=20
+        )
+        self.delete_button.pack(side=tk.LEFT, expand=True, padx=5)
 
-            scrollbar = ttk.Scrollbar(self.root, command=self.text_area.yview)
-            scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-            self.text_area.config(yscrollcommand=scrollbar.set)
+        # Create custom scrollbar style
+        style = ttk.Style()
+        style.layout('Vertical.TScrollbar',
+                     [('Vertical.Scrollbar.trough',
+                       {'children':
+                        [('Vertical.Scrollbar.thumb',
+                          {'expand': '1', 'sticky': 'nswe'})],
+                           'sticky': 'ns'})])
 
-            self.text_area.config(state=tk.DISABLED)
+        # Optionally configure colors and other properties
+        style.configure('Vertical.TScrollbar',
+                        troughcolor='#F0F0F0',
+                        background='#C0C0C0',
+                        relief='flat',
+                        arrowsize=10)
+
+        # Create Scrollbar
+        self.scrollbar = ttk.Scrollbar(
+            self.save_list,  # Changed from self.content_frame to self.save_list
+            style='Vertical.TScrollbar')
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # Ensure Listbox and Scrollbar are correctly bound
+        self.save_list.config(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.config(command=self.save_list.yview)
+
+        # Bind drag events to frame instead of scrollbar
+        self.drag_frame.bind('<Button-1>', self.start_move)
+        self.drag_frame.bind('<B1-Motion>', self.do_move)
+
+        # Create preview window
+        self.preview_window = PreviewWindow(self.root)
+        self.scaling = self.preview_window.scaling
+
+        # Add mouse event bindings for Listbox
+        self.save_list.bind('<Motion>', self.on_motion)
+        self.save_list.bind('<Leave>', self.on_leave)
+        self.save_list.bind('<<ListboxSelect>>', self.on_select)
+        self.save_list.bind('<Double-Button-1>', self.on_double_click)
+
+        self.refresh_save_list()
+
+    def format_save_name(self, name: str) -> str:
+        try:
+            date_part, time_part = name.split(' ')
+            formatted_time = f"{time_part[:2]}:{time_part[2:4]}:{time_part[4:]}"
+            return f"{date_part} {formatted_time}"
+        except Exception:
+            return name
+
+    def refresh_save_list(self):
+        self.save_list.delete(0, tk.END)
+        self.saves = get_sorted_saves()
+        for save in self.saves:
+            formatted_name = self.format_save_name(save.name)
+            self.save_list.insert(tk.END, formatted_name)
 
     def start_move(self, event):
         self.x = event.x
@@ -86,13 +175,135 @@ class GUI:
         self.config_reader.config = config
         self.config_reader.write_config()
 
-    def show_message(self, message: str):
-        self.text_area.config(state=tk.NORMAL)
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        self.text_area.insert(tk.END, f"[{timestamp}] {message}\n")
-        self.text_area.see(tk.END)
-        self.text_area.config(state=tk.DISABLED)
-        self.root.update()
+    def get_real_item_at(self, y_position):
+        if self.item_height is None and self.save_list.size() > 0:
+            bbox = self.save_list.bbox(0)
+            if bbox:
+                self.item_height = bbox[3]
+
+        if self.item_height:
+            first_visible = self.save_list.nearest(0)
+            relative_y = y_position
+            item_index = first_visible + int(relative_y / self.item_height)
+
+            if 0 <= item_index < self.save_list.size():
+                bbox = self.save_list.bbox(item_index)
+                if bbox:
+                    item_top = bbox[1]
+                    item_bottom = item_top + bbox[3]
+                    if item_top <= y_position <= item_bottom:
+                        return item_index
+        return None
+
+    def on_motion(self, event):
+        current_index = self.get_real_item_at(event.y)
+
+        if current_index is None:
+            if self.last_hover_index is not None:
+                self.save_list.itemconfig(
+                    self.last_hover_index,
+                    background='',
+                    foreground=''
+                )
+                self.last_hover_index = None
+            self.preview_window.hide()
+            return
+
+        if self.last_hover_index != current_index:
+            if self.last_hover_index is not None:
+                self.save_list.itemconfig(
+                    self.last_hover_index,
+                    background='',
+                    foreground=''
+                )
+
+            if current_index not in self.save_list.curselection():
+                self.save_list.itemconfig(
+                    current_index,
+                    background='#2a3f52',
+                    foreground='white'
+                )
+
+            self.last_hover_index = current_index
+
+        if 0 <= current_index < len(self.saves):
+            window_x = self.root.winfo_x()
+            window_width = self.root.winfo_width()
+            preview_width = int(400 * self.scaling)
+            y = self.root.winfo_y() + event.y
+
+            if window_x + window_width + preview_width + 10 > self.screen_width:
+                x = window_x - preview_width - 10
+            else:
+                x = window_x + window_width + 10
+
+            self.preview_window.show(self.saves[current_index], x, y)
+
+    def on_leave(self, event):
+        if self.last_hover_index is not None:
+            self.save_list.itemconfig(
+                self.last_hover_index,
+                background='',
+                foreground=''
+            )
+            self.last_hover_index = None
+
+        self.preview_window.hide()
+
+    def update_selection(self, index):
+        if self.last_hover_index is not None:
+            self.save_list.itemconfig(
+                self.last_hover_index,
+                background='',
+                foreground=''
+            )
+            self.last_hover_index = None
+
+        self.save_list.selection_clear(0, tk.END)
+        if index >= 0:
+            self.save_list.selection_set(index)
+            self.save_list.see(index)
+
+    def on_select(self, event):
+        selection = self.save_list.curselection()
+        if selection:
+            index = selection[0]
+            keyboard_handler = EventManager().keyboard_handler
+            if keyboard_handler:
+                keyboard_handler.current_index = index
+
+    def on_double_click(self, event):
+        selection = self.save_list.curselection()
+        if selection:
+            index = selection[0]
+            keyboard_handler = EventManager().keyboard_handler
+            if keyboard_handler:
+                keyboard_handler.current_index = index
+                keyboard_handler.saves = get_sorted_saves()
+                if (keyboard_handler.saves and 0 <= keyboard_handler.current_index < len(keyboard_handler.saves)):
+                    restore_save(
+                        keyboard_handler.saves[keyboard_handler.current_index])
+                    print(f"The Save: {
+                          keyboard_handler.saves[keyboard_handler.current_index].name} has been restored.")
+
+                    win32gui.SetForegroundWindow(win32gui.FindWindow(None, "Balatro"))
+
+                    keyboard_handler.keyboard_controller.press('f')
+                    time.sleep(0.8)
+                    keyboard_handler.keyboard_controller.release('f')
+
+    def save_game(self):
+        keyboard_handler = EventManager().keyboard_handler
+        if keyboard_handler:
+            backup_saves()
+
+    def delete_all_saves(self):
+        result = messagebox.askyesno(
+            "Confirm Delete",
+            "Are you sure you want to delete all saves?"
+        )
+        if result:
+            delete_saves()
 
     def start(self):
         self.root.mainloop()
