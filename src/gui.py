@@ -1,5 +1,6 @@
 import time
 import tkinter as tk
+import win32gui
 from tkinter import ttk, messagebox
 from read_config import ConfigReader
 from event_manager import EventManager
@@ -284,6 +285,8 @@ class GUI:
                         keyboard_handler.saves[keyboard_handler.current_index])
                     print(f"The Save: {
                           keyboard_handler.saves[keyboard_handler.current_index].name} has been restored.")
+
+                    win32gui.SetForegroundWindow(win32gui.FindWindow(None, "Balatro"))
 
                     keyboard_handler.keyboard_controller.press('f')
                     time.sleep(0.8)

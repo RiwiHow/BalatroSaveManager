@@ -4,7 +4,7 @@
     "GUI": {
         "window_opacity": 1,
         "always_on_top": true,
-        "font_size": 20,
+        "font_size": 15,
         "window_size": {
             "width": 270,
             "height": 400

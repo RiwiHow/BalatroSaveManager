@@ -17,7 +17,7 @@
 - `GUI`: 控制窗口的外观和行为
     - `window_opacity`: 控制窗口的透明度（范围：`0.0` 到 `1.0`）（默认值：`0.8`）
     - `always_on_top`: 是否始终置顶（默认值：`true`）
-    - `font_size`: 改变窗口中文字的大小 (默认值: `20`)
+    - `font_size`: 改变窗口中文字的大小 (默认值: `15`)
     - `window_size`: 设置窗口默认的宽度和高度（默认：`width = 400`, `height = 150`）
     - `window_position`: 设置窗口在屏幕上的位置。无需手动更改
 - `key_mapping`: 自定义按键映射
